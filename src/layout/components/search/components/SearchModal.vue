@@ -1,12 +1,13 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import { useRouter } from "vue-router";
+import { cloneDeep } from "@pureadmin/utils";
 import SearchResult from "./SearchResult.vue";
 import SearchFooter from "./SearchFooter.vue";
-import { deleteChildren } from "/@/utils/tree";
-import { transformI18n } from "/@/plugins/i18n";
+import { useNav } from "@/layout/hooks/useNav";
+import { ref, computed, shallowRef } from "vue";
 import { useDebounceFn, onKeyStroke } from "@vueuse/core";
-import { ref, watch, computed, nextTick, shallowRef } from "vue";
-import { usePermissionStoreHook } from "/@/store/modules/permission";
+import { usePermissionStoreHook } from "@/store/modules/permission";
+import Search from "@iconify-icons/ep/search";
 
 interface Props {
   /** 弹窗显隐 */
@@ -17,6 +18,7 @@ interface Emits {
   (e: "update:value", val: boolean): void;
 }
 
+const { device } = useNav();
 const emit = defineEmits<Emits>();
 const props = withDefaults(defineProps<Props>(), {});
 const router = useRouter();
@@ -29,7 +31,7 @@ const handleSearch = useDebounceFn(search, 300);
 
 /** 菜单树形结构 */
 const menusData = computed(() => {
-  return deleteChildren(usePermissionStoreHook().menusTree);
+  return cloneDeep(usePermissionStoreHook().wholeMenus);
 });
 
 const show = computed({
@@ -38,14 +40,6 @@ const show = computed({
   },
   set(val: boolean) {
     emit("update:value", val);
-  }
-});
-
-watch(show, async val => {
-  if (val) {
-    /** 自动聚焦 */
-    await nextTick();
-    inputRef.value?.focus();
   }
 });
 
@@ -68,7 +62,7 @@ function search() {
   resultOptions.value = flatMenusData.filter(
     menu =>
       keyword.value &&
-      transformI18n(menu.meta?.title)
+      menu.meta?.title
         .toLocaleLowerCase()
         .includes(keyword.value.toLocaleLowerCase().trim())
   );
@@ -130,7 +124,14 @@ onKeyStroke("ArrowDown", handleDown);
 </script>
 
 <template>
-  <el-dialog top="5vh" v-model="show" :before-close="handleClose">
+  <el-dialog
+    top="5vh"
+    v-model="show"
+    :width="device === 'mobile' ? '80vw' : '50vw'"
+    :before-close="handleClose"
+    @opened="inputRef.focus()"
+    @closed="inputRef.blur()"
+  >
     <el-input
       ref="inputRef"
       v-model="keyword"
@@ -140,7 +141,7 @@ onKeyStroke("ArrowDown", handleDown);
     >
       <template #prefix>
         <span class="el-input__icon">
-          <IconifyIconOffline icon="search" />
+          <IconifyIconOffline :icon="Search" />
         </span>
       </template>
     </el-input>

@@ -1,21 +1,26 @@
-<h1>vue-pure-admin Lite Edition</h1>
+<h1>vue-pure-admin Lite Edition（no i18n version）</h1>
 
-[![license](https://img.shields.io/github/license/xiaoxian521/vue-pure-admin.svg)](LICENSE)
+[![license](https://img.shields.io/github/license/pure-admin/vue-pure-admin.svg)](LICENSE)
 
 **English** | [中文](./README.md)
 
-## introduce
+## Introduce
 
-The lite version is based on the shelf extracted from [vue-pure-admin](https://github.com/xiaoxian521/vue-pure-admin), which contains the main functions and is more suitable for actual project development, the packaged size is only more than `3MB`
+The simplified version is based on the shelf extracted from [vue-pure-admin](https://github.com/pure-admin/vue-pure-admin), which contains main functions and is more suitable for actual project development. The packaged size is introduced globally [element-plus](https://element-plus.org) is still below `2.3MB`, and the full version of the code will be permanently synchronized. After enabling `brotli` compression and `cdn` to replace the local library mode, the package size is less than `350kb`
 
 ## Supporting Video
 
-- [Click Watch Tutorial](https://www.bilibili.com/video/BV1534y1S7HV)
+- [Click Watch Tutorial](https://www.bilibili.com/video/BV1kg411v7QT)
 - [Click Watch UI Design](https://www.bilibili.com/video/BV17g411T7rq)
 
 ## Docs
 
-- [Click Watch Docs](https://pure-admin-doc.vercel.app)
+- [Click me to view the domestic documentation site](https://yiming_chang.gitee.io/pure-admin-doc)
+- [Click me to view foreign document site](https://pure-admin.github.io/pure-admin-doc)
+
+## Preview
+
+- [Click me to view the preview station](https://pure-admin-thin.netlify.app/#/login)
 
 ## Usage
 
@@ -39,8 +44,7 @@ bilibili: https://www.bilibili.com/video/BV1534y1S7HV/
 
 ## ⚠️ Attention
 
-- The Lite version does not accept any issues and prs. If you have any questions, please go to the full version https://github.com/xiaoxian521/vue-pure-admin/issues/new/choose to mention, thank you! ! !
-- Don't use the `delete-i18n` branch code, this branch is just for you to completely delete the internationalized references, it won't sync the code! ! ! [Completely remove the internationalization tutorial](https://www.bilibili.com/video/BV1Ru411B7k3/), please be sure to use the code from the `main` branch! ! !
+- The Lite version does not accept any issues and prs. If you have any questions, please go to the full version https://github.com/pure-admin/vue-pure-admin/issues/new/choose to mention, thank you! ! !
 
 ## License
 

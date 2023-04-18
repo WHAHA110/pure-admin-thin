@@ -1,51 +1,30 @@
 <script setup lang="ts">
-import { useI18n } from "vue-i18n";
-import { useNav } from "../../hooks/nav";
 import Search from "../search/index.vue";
 import Notice from "../notice/index.vue";
-import { templateRef } from "@vueuse/core";
+import { ref, watch, nextTick } from "vue";
 import SidebarItem from "./sidebarItem.vue";
-import avatars from "/@/assets/avatars.jpg";
-import screenfull from "../screenfull/index.vue";
-import { useRoute, useRouter } from "vue-router";
-import { deviceDetection } from "/@/utils/deviceDetection";
-import { watch, nextTick, onMounted, getCurrentInstance } from "vue";
-import { usePermissionStoreHook } from "/@/store/modules/permission";
-import globalization from "/@/assets/svg/globalization.svg?component";
+import { useNav } from "@/layout/hooks/useNav";
+import { usePermissionStoreHook } from "@/store/modules/permission";
+import LogoutCircleRLine from "@iconify-icons/ri/logout-circle-r-line";
+import Setting from "@iconify-icons/ri/settings-3-line";
 
-const route = useRoute();
-const { locale, t } = useI18n();
-const routers = useRouter().options.routes;
-const menuRef = templateRef<ElRef | null>("menu", null);
-const instance =
-  getCurrentInstance().appContext.config.globalProperties.$storage;
-const title =
-  getCurrentInstance().appContext.config.globalProperties.$config?.Title;
+const menuRef = ref();
 
 const {
+  route,
+  title,
+  routers,
   logout,
   backHome,
   onPanel,
-  changeTitle,
-  handleResize,
   menuSelect,
   username,
-  avatarsStyle,
-  getDropdownItemStyle
+  avatarsStyle
 } = useNav();
 
-onMounted(() => {
-  nextTick(() => {
-    handleResize(menuRef.value);
-  });
+nextTick(() => {
+  menuRef.value?.handleResize();
 });
-
-watch(
-  () => locale.value,
-  () => {
-    changeTitle(route.meta);
-  }
-);
 
 watch(
   () => route.path,
@@ -53,32 +32,23 @@ watch(
     menuSelect(route.path, routers);
   }
 );
-
-function translationCh() {
-  instance.locale = { locale: "zh" };
-  locale.value = "zh";
-  handleResize(menuRef.value);
-}
-
-function translationEn() {
-  instance.locale = { locale: "en" };
-  locale.value = "en";
-  handleResize(menuRef.value);
-}
 </script>
 
 <template>
-  <div class="horizontal-header">
+  <div
+    v-loading="usePermissionStoreHook().wholeMenus.length === 0"
+    class="horizontal-header"
+  >
     <div class="horizontal-header-left" @click="backHome">
-      <FontIcon icon="team-iconlogo" svg style="width: 35px; height: 35px" />
-      <h4>{{ title }}</h4>
+      <img src="/logo.svg" alt="logo" />
+      <span>{{ title }}</span>
     </div>
     <el-menu
-      ref="menu"
-      class="horizontal-header-menu"
-      mode="horizontal"
-      :default-active="route.path"
       router
+      ref="menuRef"
+      mode="horizontal"
+      class="horizontal-header-menu"
+      :default-active="route.path"
       @select="indexPath => menuSelect(indexPath, routers)"
     >
       <sidebar-item
@@ -93,76 +63,41 @@ function translationEn() {
       <Search />
       <!-- 通知 -->
       <Notice id="header-notice" />
-      <!-- 全屏 -->
-      <screenfull id="header-screenfull" v-show="!deviceDetection()" />
-      <!-- 国际化 -->
-      <el-dropdown id="header-translation" trigger="click">
-        <globalization />
-        <template #dropdown>
-          <el-dropdown-menu class="translation">
-            <el-dropdown-item
-              :style="getDropdownItemStyle(locale, 'zh')"
-              @click="translationCh"
-            >
-              <span class="check-zh" v-show="locale === 'zh'">
-                <IconifyIconOffline icon="check" /> </span
-              >简体中文
-            </el-dropdown-item>
-            <el-dropdown-item
-              :style="getDropdownItemStyle(locale, 'en')"
-              @click="translationEn"
-            >
-              <span class="check-en" v-show="locale === 'en'">
-                <IconifyIconOffline icon="check" /> </span
-              >English</el-dropdown-item
-            >
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-      <!-- 退出登陆 -->
+      <!-- 退出登录 -->
       <el-dropdown trigger="click">
-        <span class="el-dropdown-link">
-          <img v-if="avatars" :src="avatars" :style="avatarsStyle" />
-          <p v-if="username">{{ username }}</p>
+        <span class="el-dropdown-link navbar-bg-hover">
+          <img
+            src="https://avatars.githubusercontent.com/u/44761321?v=4"
+            :style="avatarsStyle"
+          />
+          <p v-if="username" class="dark:text-white">{{ username }}</p>
         </span>
         <template #dropdown>
           <el-dropdown-menu class="logout">
             <el-dropdown-item @click="logout">
               <IconifyIconOffline
-                icon="logout-circle-r-line"
+                :icon="LogoutCircleRLine"
                 style="margin: 5px"
               />
-              {{ t("buttons.hsLoginOut") }}</el-dropdown-item
-            >
+              退出系统
+            </el-dropdown-item>
           </el-dropdown-menu>
         </template>
       </el-dropdown>
       <span
-        class="el-icon-setting"
-        :title="t('buttons.hssystemSet')"
+        class="set-icon navbar-bg-hover"
+        title="打开项目配置"
         @click="onPanel"
       >
-        <IconifyIconOffline icon="setting" />
+        <IconifyIconOffline :icon="Setting" />
       </span>
     </div>
   </div>
 </template>
 
 <style lang="scss" scoped>
-.translation {
-  ::v-deep(.el-dropdown-menu__item) {
-    padding: 5px 40px;
-  }
-
-  .check-zh {
-    position: absolute;
-    left: 20px;
-  }
-
-  .check-en {
-    position: absolute;
-    left: 20px;
-  }
+:deep(.el-loading-mask) {
+  opacity: 0.45;
 }
 
 .logout {
